@@ -2,7 +2,7 @@
 #include "Bela.h"
 #include "../Pepper.h"
 
-struct CvProbe : Pepper {
+struct CvProbe : Pepper<CvProbe> {
     using Pepper::Pepper;
     float in(int ch)  { return cvIn(ch); }
     float inV(int ch) { return cvInV(ch); }
@@ -32,7 +32,7 @@ TEST_CASE("cvIn honors a custom cvInPin mapping") {
     CHECK(p.in(1) == doctest::Approx(0.42f));
 }
 
-struct CvOutProbe : Pepper {
+struct CvOutProbe : Pepper<CvOutProbe> {
     using Pepper::Pepper;
     void out(int ch, float v)  { cvOut(ch, v); }
     void outV(int ch, float v) { cvOutV(ch, v); }
@@ -67,7 +67,7 @@ TEST_CASE("pot reads the same channel as cvIn") {
     BelaContext c;
     c.analogIn[0 * 8 + 3] = 0.66f;   // channel for CVin4 / Pot4
     CvProbe p; p._setup(&c);
-    struct PotProbe : Pepper { using Pepper::Pepper; float k(int ch){ return pot(ch); } };
+    struct PotProbe : Pepper<PotProbe> { using Pepper::Pepper; float k(int ch){ return pot(ch); } };
     PotProbe pp; pp._setup(&c);
     CHECK(pp.k(4) == doctest::Approx(p.in(4)));
     CHECK(pp.k(4) == doctest::Approx(0.66f));

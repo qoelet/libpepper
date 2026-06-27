@@ -2,7 +2,7 @@
 #include "Bela.h"
 #include "../Pepper.h"
 
-struct BtnProbe : Pepper {
+struct BtnProbe : Pepper<BtnProbe> {
     using Pepper::Pepper;
     bool lvl(int i)  { return button(i); }
     bool rose(int i) { return buttonRose(i); }

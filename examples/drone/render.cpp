@@ -3,7 +3,7 @@
 #include "Pepper.h"
 #include "meter.h"
 
-class Drone : public Pepper {
+class Drone final : public Pepper<Drone> {
     static constexpr float kFreqMin   = 55.f;   // knob 1 / random low
     static constexpr float kFreqMax   = 440.f;  // knob 1 / random high
     static constexpr float kDetuneMax = 0.03f;  // knob 2 full -> 3% detune
@@ -16,7 +16,8 @@ class Drone : public Pepper {
     int   active_ = 1;          // 1-based knob currently displayed
     bool  randomFreq = false;   // button 1 latched a random pitch
 
-    void control() override {
+public:
+    void control() {
         // knob 1 -> pitch, knob 2 -> detune amount (beat speed)
         float cur[kKnobs];
         for (int i = 0; i < kKnobs; ++i) cur[i] = pot(i + 1);
@@ -41,7 +42,7 @@ class Drone : public Pepper {
         cvOut(2, phase2);
     }
 
-    void audio() override {
+    void audio() {
         float s = sinf(phase * 2.f * (float)M_PI);
         audioOut(1, s);
         audioOut(2, s);

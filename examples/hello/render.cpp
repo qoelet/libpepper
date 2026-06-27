@@ -2,7 +2,7 @@
 #include "meter.h"
 
 // No audio is produced; this is purely an input-visualisation demo.
-class Hello : public Pepper {
+class Hello final : public Pepper<Hello> {
     static const int kKnobs = 8;
     static const int kLeds  = 10;
     static constexpr float kMoveThreshold = 0.02f;
@@ -10,7 +10,8 @@ class Hello : public Pepper {
     float ref_[kKnobs] = {};
     int   active_ = 1;          // 1-based knob currently displayed
 
-    void control() override {
+public:
+    void control() {
         // Read all knobs and find the one currently being turned. trackActiveKnob
         // accumulates slow turns (per-frame deltas are far below threshold) and
         // updates ref_ in place, so we don't snapshot prev each frame.

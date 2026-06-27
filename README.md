@@ -9,15 +9,16 @@ Usage is simple: You extend from `Pepper`, implement two callbacks — `control(
 ```cpp
 #include "Pepper.h"
 
-class Drone : public Pepper {
+class Drone : public Pepper<Drone> {
     float phase = 0.f, freq = 110.f;
 
-    void control() override {
+public:
+    void control() {
         freq = 55.f * (1.f + 7.f * pot(1));   // knob 1 -> pitch
         led(1, button(1));
         cvOut(1, phase);                       // ramp LFO out
     }
-    void audio() override {
+    void audio() {
         float s = sinf(phase * 2 * M_PI);
         audioOut(1, s);
         audioOut(2, s);

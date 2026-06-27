@@ -13,10 +13,10 @@ struct PepperConfig {
     int   buttonDebounceFrames = 2;
 };
 
+template <class D>
 class Pepper {
 public:
     explicit Pepper(const PepperConfig& cfg = PepperConfig{}) : cfg_(cfg) {}
-    virtual ~Pepper() = default;
 
     bool _setup(BelaContext* c) {
         ctx_ = c;
@@ -30,74 +30,74 @@ public:
         for (int i = 0; i < 4;  ++i) pinMode(c, 0, cfg_.buttonPin[i], INPUT);
         for (int i = 0; i < 4;  ++i) { btnLevel_[i] = btnRose_[i] = btnFell_[i] = false; btnCount_[i] = 0; }
         for (int i = 0; i < 10; ++i) ledState_[i] = false;
-        return init();
+        return self().init();
     }
 
     void _render(BelaContext* c) {
         ctx_ = c;
         latchButtons();
-        for (cf_ = 0; cf_ < c->analogFrames; ++cf_) control();
+        for (cf_ = 0; cf_ < c->analogFrames; ++cf_) self().control();
         applyLeds();
-        for (af_ = 0; af_ < c->audioFrames; ++af_) audio();
+        for (af_ = 0; af_ < c->audioFrames; ++af_) self().audio();
     }
 
-    void _cleanup(BelaContext* c) { (void)c; onCleanup(); }
+    void _cleanup(BelaContext* c) { (void)c; self().onCleanup(); }
 
 protected:
-    virtual void control() {}
-    virtual void audio()   {}
-    virtual bool init()    { return true; }
-    virtual void onCleanup() {}
+    void control() {}
+    void audio()   {}
+    bool init()    { return true; }
+    void onCleanup() {}
 
-    float cvIn(int ch) {
+    float cvIn(int ch) noexcept {
         if (ch < 1 || ch > 8 || !ctx_) return 0.f;
         return analogRead(ctx_, cf_, cfg_.cvInPin[ch - 1]);
     }
 
-    float cvInV(int ch) { return cvIn(ch) * cfg_.cvInVoltMax; }
+    float cvInV(int ch) noexcept { return cvIn(ch) * cfg_.cvInVoltMax; }
 
-    void cvOut(int ch, float v) {
+    void cvOut(int ch, float v) noexcept {
         if (ch < 1 || ch > 8 || !ctx_) return;
         analogWrite(ctx_, cf_, cfg_.cvOutPin[ch - 1], constrain(v, 0.f, 1.f));
     }
 
-    void cvOutV(int ch, float volts) {
+    void cvOutV(int ch, float volts) noexcept {
         cvOut(ch, volts / cfg_.cvOutVoltMax);
     }
 
-    float pot(int ch) { return cvIn(ch); }  // pot attenuates the CV jack: same channel
+    float pot(int ch) noexcept { return cvIn(ch); }  // pot attenuates the CV jack: same channel
 
-    float audioIn(int ch) {
+    float audioIn(int ch) noexcept {
         if (ch < 1 || ch > 2 || !ctx_) return 0.f;
         return audioRead(ctx_, af_, ch - 1);
     }
 
-    void audioOut(int ch, float v) {
+    void audioOut(int ch, float v) noexcept {
         if (ch < 1 || ch > 2 || !ctx_) return;
         audioWrite(ctx_, af_, ch - 1, constrain(v, -1.f, 1.f));
     }
 
-    void led(int i, bool on) {
+    void led(int i, bool on) noexcept {
         if (i < 1 || i > 10) return;
         ledState_[i - 1] = on;
     }
 
-    void ledLevel(int i, float b) { led(i, b >= 0.5f); }  // v1: threshold; PWM is future
+    void ledLevel(int i, float b) noexcept { led(i, b >= 0.5f); }  // v1: threshold; PWM is future
 
-    void applyLeds() {
+    void applyLeds() noexcept {
         if (!ctx_) return;
         for (unsigned f = 0; f < ctx_->digitalFrames; ++f)
             for (int i = 0; i < 10; ++i)
                 digitalWrite(ctx_, f, cfg_.ledPin[i], ledState_[i] ? 1.f : 0.f);
     }
 
-    bool button(int i)     { return (i < 1 || i > 4) ? false : btnLevel_[i - 1]; }
+    bool button(int i)     noexcept { return (i < 1 || i > 4) ? false : btnLevel_[i - 1]; }
 
-    bool buttonRose(int i) { return (i < 1 || i > 4) ? false : btnRose_[i - 1]; }
+    bool buttonRose(int i) noexcept { return (i < 1 || i > 4) ? false : btnRose_[i - 1]; }
 
-    bool buttonFell(int i) { return (i < 1 || i > 4) ? false : btnFell_[i - 1]; }
+    bool buttonFell(int i) noexcept { return (i < 1 || i > 4) ? false : btnFell_[i - 1]; }
 
-    void latchButtons() {
+    void latchButtons() noexcept {
         if (!ctx_) return;
         for (int i = 0; i < 4; ++i) {
             btnRose_[i] = false;
@@ -114,9 +114,9 @@ protected:
         }
     }
 
-    float audioRate()   const { return audioRate_; }
+    float audioRate()   const noexcept { return audioRate_; }
 
-    float controlRate() const { return controlRate_; }
+    float controlRate() const noexcept { return controlRate_; }
 
     PepperConfig cfg_;
     BelaContext* ctx_ = nullptr;
@@ -126,6 +126,9 @@ protected:
     bool ledState_[10] = {};
     bool btnLevel_[4] = {};  bool btnRose_[4] = {};  bool btnFell_[4] = {};
     int  btnCount_[4] = {};
+
+private:
+    D& self() noexcept { return static_cast<D&>(*this); }
 };
 
 #define PEPPER_MAIN(T)                                                              \

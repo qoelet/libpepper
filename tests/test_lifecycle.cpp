@@ -2,7 +2,7 @@
 #include "Bela.h"
 #include "../Pepper.h"
 
-struct BareCard : Pepper { using Pepper::Pepper; };
+struct BareCard : Pepper<BareCard> { using Pepper::Pepper; };
 
 TEST_CASE("setup stores sample rates from context") {
     BelaContext c;
@@ -10,7 +10,7 @@ TEST_CASE("setup stores sample rates from context") {
     c.analogSampleRate = 22050.f;
     BareCard card;
     REQUIRE(card._setup(&c) == true);
-    struct Probe : Pepper { using Pepper::Pepper;
+    struct Probe : Pepper<Probe> { using Pepper::Pepper;
         float aR(){ return audioRate(); } float cR(){ return controlRate(); } };
     Probe p; p._setup(&c);
     CHECK(p.aR() == doctest::Approx(44100.f));
@@ -41,14 +41,14 @@ TEST_CASE("setup sets LED pins to OUTPUT and button pins to INPUT") {
     for (int i = 0; i < 4;  ++i) CHECK(c.digitalDir[kBtnCh[i]] == INPUT);
 }
 
-struct RampCard : Pepper {
+struct RampCard : Pepper<RampCard> {
     using Pepper::Pepper;
     int controlCalls = 0, audioCalls = 0;
-    void control() override {
+    void control() {
         cvOut(1, 0.1f * cf_);          // distinct value per analog frame
         controlCalls++;
     }
-    void audio() override {
+    void audio() {
         audioOut(1, 0.01f * af_);
         audioCalls++;
     }
@@ -68,9 +68,9 @@ TEST_CASE("render calls control per analog frame and audio per audio frame") {
 
 TEST_CASE("render latches buttons once per block before control runs") {
     BelaContext c;
-    struct BtnReader : Pepper { using Pepper::Pepper;
+    struct BtnReader : Pepper<BtnReader> { using Pepper::Pepper;
         bool seen = false;
-        void control() override { if (button(1)) seen = true; } };
+        void control() { if (button(1)) seen = true; } };
     BtnReader card; REQUIRE(card._setup(&c));
     c.digital[0 * 16 + 15] = 1.f;        // Btn1 pressed (channel 15)
     card._render(&c);                    // block 1: debounce not met

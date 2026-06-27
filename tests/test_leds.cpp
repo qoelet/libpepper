@@ -2,7 +2,7 @@
 #include "Bela.h"
 #include "../Pepper.h"
 
-struct LedProbe : Pepper {
+struct LedProbe : Pepper<LedProbe> {
     using Pepper::Pepper;
     void set(int i, bool on)     { led(i, on); }
     void setLevel(int i, float b){ ledLevel(i, b); }

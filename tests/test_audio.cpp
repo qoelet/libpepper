@@ -2,7 +2,7 @@
 #include "Bela.h"
 #include "../Pepper.h"
 
-struct AudioProbe : Pepper {
+struct AudioProbe : Pepper<AudioProbe> {
     using Pepper::Pepper;
     float in(int ch)            { return audioIn(ch); }
     void  out(int ch, float v)  { audioOut(ch, v); }
