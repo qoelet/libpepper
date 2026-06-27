@@ -1,0 +1,17 @@
+# Build artifacts
+build/
+*.o
+*.d
+*.a
+
+# Test binaries
+test/run
+test/*.out
+tests/run
+tests/*.out
+
+# Editor / OS
+.DS_Store
+*.swp
+compile_commands.json
+.cache/
