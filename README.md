@@ -3,6 +3,8 @@
 A small, single-header C++ library for the [Bela Pepper](https://github.com/BelaPlatform/Bela/wiki/Pepper)
 Eurorack module.
 
+![Pepper panel with the libpepper API mapped to each control](libpepper.png)
+
 Usage is simple: You extend from `Pepper`, implement two callbacks — `control()`
 (analog/CV rate) and `audio()` (audio rate).
 
