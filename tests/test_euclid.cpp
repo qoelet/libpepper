@@ -33,7 +33,7 @@ TEST_CASE("Every call generates over the entire buffer") {
 }
 
 TEST_CASE("Clamps to buffer size when impossible length") {
-  
+
   Seq result;
 
   euclid(3, 99, &result);

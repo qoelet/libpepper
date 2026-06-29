@@ -9,42 +9,42 @@ protected:
   float amount_ = 0.f;
   int flashFrames_ = 0;
   static constexpr float kFlashSeconds = 0.4f;
+
 public:
   void control() {
-    amount_ = pot(1);    
+    amount_ = pot(1);
 
     bool selected = false;
-    if(buttonRose(1)) {
+    if (buttonRose(1)) {
       type_ = distortionType::hard;
       selected = true;
     }
-    if(buttonRose(2)) {
+    if (buttonRose(2)) {
       type_ = distortionType::soft;
       selected = true;
     }
-    if(buttonRose(3)) {
+    if (buttonRose(3)) {
       type_ = distortionType::cubic;
       selected = true;
     }
-    if(buttonRose(4)) {
+    if (buttonRose(4)) {
       type_ = distortionType::fold;
       selected = true;
     }
 
-    if(selected) {
+    if (selected) {
       flashFrames_ = static_cast<int>(controlRate() * kFlashSeconds);
     }
 
-    if(flashFrames_ > 0) {
+    if (flashFrames_ > 0) {
       int sel = static_cast<int>(type_);
-      for(int i = 1; i <= 10; ++i) {
+      for (int i = 1; i <= 10; ++i) {
         led(i, i == sel);
       }
       --flashFrames_;
-    }
-    else {
+    } else {
       int to_display = meterCount(amount_, 10);
-      for(int i = 1; i <= 10; ++i) {
+      for (int i = 1; i <= 10; ++i) {
         led(i, i <= to_display);
       }
     }

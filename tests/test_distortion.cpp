@@ -2,7 +2,7 @@
 #include "Bela.h"
 #include "../examples/distortion/Distortion.h"
 
-static void setBtn(BelaContext&c, int i, bool pressed) {
+static void setBtn(BelaContext& c, int i, bool pressed) {
   static const int kBtnCh[4] = {15, 14, 13, 12};
   c.digital[0 * 16 + kBtnCh[i - 1]] = pressed ? 1.f : 0.f;
 }
@@ -16,10 +16,10 @@ struct DistProbe : Distortion {
 
 TEST_CASE("Passthrough at zero") {
   BelaContext c;
-  for(unsigned f = 0; f < c.analogFrames; ++f) {
-    c.analogIn[f*8 + 0] = 0.f; // amount = 0
+  for (unsigned f = 0; f < c.analogFrames; ++f) {
+    c.analogIn[f * 8 + 0] = 0.f; // amount = 0
   }
-  for(unsigned f = 0; f < c.audioFrames; ++f) {
+  for (unsigned f = 0; f < c.audioFrames; ++f) {
     c.audioIn[f * c.audioInChannels + 0] = 0.3f;
     c.audioIn[f * c.audioInChannels + 1] = 0.3f;
   }
@@ -34,10 +34,10 @@ TEST_CASE("Passthrough at zero") {
 
 TEST_CASE("Distort at max") {
   BelaContext c;
-  for(unsigned f = 0; f < c.analogFrames; ++f) {
-    c.analogIn[f*8 + 0] = 1.f; // amount = 1
+  for (unsigned f = 0; f < c.analogFrames; ++f) {
+    c.analogIn[f * 8 + 0] = 1.f; // amount = 1
   }
-  for(unsigned f = 0; f < c.audioFrames; ++f) {
+  for (unsigned f = 0; f < c.audioFrames; ++f) {
     c.audioIn[f * c.audioInChannels + 0] = 0.3f;
     c.audioIn[f * c.audioInChannels + 1] = 0.3f;
   }
@@ -81,7 +81,7 @@ TEST_CASE("Buttons selects distortion type") {
 
 TEST_CASE("Display shows distortion amount") {
   BelaContext c;
-  for(unsigned f = 0; f < c.analogFrames; ++f) {
+  for (unsigned f = 0; f < c.analogFrames; ++f) {
     c.analogIn[f * 8 + 0] = 0.5f;
   }
 
@@ -95,7 +95,7 @@ TEST_CASE("Display shows distortion amount") {
 
 TEST_CASE("Pressing a button displays the selection") {
   BelaContext c;
-  for(unsigned f = 0; f < c.analogFrames; ++f) {
+  for (unsigned f = 0; f < c.analogFrames; ++f) {
     c.analogIn[f * 8 + 0] = 1.f; // entire meter is on
   }
 
@@ -113,7 +113,7 @@ TEST_CASE("Pressing a button displays the selection") {
 
 TEST_CASE("Selection expires back to distortion meter") {
   BelaContext c;
-  for(unsigned f = 0; f < c.analogFrames; ++f) {
+  for (unsigned f = 0; f < c.analogFrames; ++f) {
     c.analogIn[f * 8 + 0] = 0.5f;
   }
 
@@ -124,7 +124,7 @@ TEST_CASE("Selection expires back to distortion meter") {
   d._render(&c);
   d._render(&c);
 
-  for(int i = 0; i < 5000 & d.flash() > 0; ++i) {
+  for (int i = 0; i<5000 & d.flash()> 0; ++i) {
     d._render(&c);
   }
 
