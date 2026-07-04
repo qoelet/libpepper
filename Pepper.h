@@ -2,6 +2,7 @@
 
 #include <Bela.h>
 #include <Utilities.h>
+#include <libraries/Scope/Scope.h>
 
 struct PepperConfig {
   int cvInPin[8] = {0, 1, 2, 3, 4, 5, 6, 7}; // CVin/Pot 1..8 -> analog input channel
@@ -11,6 +12,7 @@ struct PepperConfig {
   float cvInVoltMax = 10.f;
   float cvOutVoltMax = 5.f;
   int buttonDebounceFrames = 2;
+  int scopeChannels = 0; // >0 enables the Bela Scope with this many channels (control rate)
 };
 
 template <class D>
@@ -37,6 +39,10 @@ public:
       btnCount_[i] = 0;
     }
     for (int i = 0; i < 10; ++i) ledState_[i] = false;
+    if (cfg_.scopeChannels > 0) {
+      scope_.setup(cfg_.scopeChannels, controlRate_);
+    }
+
     return self().init();
   }
 
@@ -73,6 +79,16 @@ protected:
 
   void cvOutV(int ch, float volts) noexcept {
     cvOut(ch, volts / cfg_.cvOutVoltMax);
+  }
+
+  // Log values to the Bela Scope (viewable in the IDE scope). Call from control()
+  // with exactly PepperConfig::scopeChannels arguments. No-op when the scope is
+  // disabled (scopeChannels == 0). The scope runs at control/analog rate.
+  template <class... Fs>
+  void scope(Fs... vs) noexcept {
+    if (cfg_.scopeChannels <= 0) return;
+    float buf[sizeof...(vs)] = {static_cast<float>(vs)...};
+    scope_.log(buf);
   }
 
   float pot(int ch) noexcept { return cvIn(ch); } // pot attenuates the CV jack: same channel
@@ -138,6 +154,7 @@ protected:
   bool btnRose_[4] = {};
   bool btnFell_[4] = {};
   int btnCount_[4] = {};
+  Scope scope_;
 
 private:
   D& self() noexcept { return static_cast<D&>(*this); }
