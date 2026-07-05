@@ -3,7 +3,7 @@ CXXFLAGS ?= -std=c++11 -Wall -Wextra -O0 -g -I fake -I . -I .. -I ../examples/co
 SRC = test_main.cpp test_lifecycle.cpp test_cv.cpp test_audio.cpp test_leds.cpp test_buttons.cpp test_meter.cpp \
 		test_euclid.cpp test_sequencer.cpp \
 		test_distort.cpp test_distortion.cpp \
-		test_pulser.cpp test_scope.cpp
+		test_pulser.cpp test_scope.cpp test_envelope.cpp
 EXISTING = $(wildcard $(SRC))
 run: $(EXISTING)
 	$(CXX) $(CXXFLAGS) $(EXISTING) -o run
